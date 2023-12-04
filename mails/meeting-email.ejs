@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lms Activation Email</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .main {
+        width: 98%;
+        margin: auto;
+      }
+      h1 {
+        background: rgb(0, 110, 255);
+        border: 1px solid rgb(0, 110, 255);
+        color: white;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        text-align: center;
+        padding: 8px;
+      }
+      h2 {
+        font-weight: bold;
+      }
+      .content {
+        padding: 8px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <h1>Welcome to Student Portal</h1>
+      <div class="content">
+        <p>Hi, <%= name %></p>
+        <p>Please login Class is live</p>
+      </div>
+    </div>
+  </body>
+</html>
