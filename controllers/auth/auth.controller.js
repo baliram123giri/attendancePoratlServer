@@ -59,7 +59,7 @@ async function loginStudent(req, res) {
             secure: true,
             httpOnly: true,
             sameSite: 'None',
-            domain:".onrender.com"
+            domain:".render.com"
         });
 
         return res.json({
