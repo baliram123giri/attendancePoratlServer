@@ -56,7 +56,7 @@ async function loginStudent(req, res) {
             expires: new Date('01 12 2024'),
             secure: true,
             httpOnly: true,
-            sameSite: 'lax'
+            sameSite: 'None'
         });
         return res.json({
             ...user._doc, token
