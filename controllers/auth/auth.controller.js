@@ -58,8 +58,7 @@ async function loginStudent(req, res) {
             expires: twoDaysFromNow,
             secure: true,
             httpOnly: true,
-            sameSite: 'None',
-            domain:".render.com"
+            sameSite: 'None'
         });
 
         return res.json({
