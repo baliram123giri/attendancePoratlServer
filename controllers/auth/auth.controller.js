@@ -50,7 +50,7 @@ async function loginStudent(req, res) {
 
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "24h" })
         user.role = undefined
-        req.session.user = user
+        req.session.user = "hello"
         return res.json({
             ...user._doc, token
         })
