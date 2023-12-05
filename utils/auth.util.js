@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken")
 
 function authSign(req, res, next) {
     const isVerified = req.headers.authorization || ""
-    console.log(req.session.user)
     try {
         if (!isVerified) {
             return res.status(500).json({ message: "please provide a token" })

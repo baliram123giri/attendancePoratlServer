@@ -14,17 +14,6 @@ const PORT = process.env.PORT || 4000
 app.use(cookieParser())
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
-app.use(session({
-    secret: "SeesionStore",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        secure: true,
-        sameSite: false,
-        maxAge: 200000
-    }
-}))
 
 const server = http.createServer(app);
 const io = socketIO(server);

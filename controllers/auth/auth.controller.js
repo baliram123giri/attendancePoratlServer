@@ -50,7 +50,14 @@ async function loginStudent(req, res) {
 
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "24h" })
         user.role = undefined
-        res.cookie(`Cookie token name`,`encrypted cookie string Value`);
+        res.cookie(`Cookie token name`, `encrypted cookie string Value`, {
+            maxAge: 5000,
+            // expires works the same as the maxAge
+            expires: new Date('01 12 2024'),
+            secure: true,
+            httpOnly: true,
+            sameSite: 'lax'
+        });
         return res.json({
             ...user._doc, token
         })
