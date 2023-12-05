@@ -58,7 +58,8 @@ async function loginStudent(req, res) {
             expires: twoDaysFromNow,
             secure: true,
             httpOnly: true,
-            sameSite: 'None'
+            sameSite: 'None',
+            domain:".bgtechub.com"
         });
 
         return res.json({
