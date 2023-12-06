@@ -60,7 +60,6 @@ async function loginStudent(req, res) {
         user.password = undefined;
         const token = generateAccessToken(user._doc);
 
-        
         setAccessTokenCookie(res, token);
 
         user.role = undefined;
