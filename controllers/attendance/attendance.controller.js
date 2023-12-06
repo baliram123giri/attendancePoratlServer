@@ -65,10 +65,6 @@ async function attendanceList(req, res) {
 const joinedList = async () => {
     try {
         const data = await Attendance.aggregate([{
-            $match: {
-                date: new Date().toLocaleDateString()
-            }
-        }, {
             $lookup: {
                 from: "users",
                 localField: "studentID",
