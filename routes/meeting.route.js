@@ -1,4 +1,5 @@
 const router = require("express").Router()
 const { createMeeting } = require("../controllers/meeting/meeting.controller")
-router.post(`/create`, createMeeting)
+const { authorize } = require("../utils/auth.util")
+router.post(`/create`, authorize("admin"), createMeeting)
 module.exports = router

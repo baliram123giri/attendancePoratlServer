@@ -10,7 +10,7 @@ const studentCreate = Joi.object({
         state: Joi.string().trim().required("State is required!"),
         city: Joi.string().trim().required("City is required!"),
         pincode: Joi.string().trim().required("Pincode is required!"),
-    }).required("address is required!"),
+    }).optional(),
 })
 
 const loginSchema = Joi.object({

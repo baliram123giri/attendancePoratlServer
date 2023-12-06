@@ -8,7 +8,7 @@ async function addAttendance(req, res) {
         const isAttended = await Attendance.findOne({ ...req.body, studentID: res.id })
         if (isAttended) return res.status(500).json({ message: "attendance already updated!" })
 
-        await Attendance.create({ ...req.body, studentID: res.id , time: `${new Date().toLocaleTimeString()}`})
+        await Attendance.create({ ...req.body, studentID: res.id, time: `${new Date().toLocaleTimeString()}` })
         return res.json({ message: "Attendance updated successfully" })
 
     } catch (error) {
@@ -19,40 +19,42 @@ async function addAttendance(req, res) {
 async function attendanceList(req, res) {
     try {
         let data = []
-        if (res.role === "admin") {
-            data = await Attendance.aggregate([{
-                $lookup: {
-                    from: "users",
-                    localField: "studentID",
-                    foreignField: "_id",
-                    as: "studentData"
-                },
 
+        const query = [{
+            $lookup: {
+                from: "users",
+                localField: "studentID",
+                foreignField: "_id",
+                as: "studentData"
             },
-            {
-                $unwind: "$studentData"
-            },
-            {
-                $lookup: {
-                    from: "courses",
-                    foreignField: "_id",
-                    localField: "course",
-                    as: "courseData"
-                }
-            },
-            { $unwind: "$courseData" },
-            {
-                $project: {
-                    _id: 1,
-                    name: '$studentData.name',
-                    date: 1,
-                    time: 1,
-                    course: "$courseData.name"
-                }
+
+        },
+        {
+            $unwind: "$studentData"
+        },
+        {
+            $lookup: {
+                from: "courses",
+                foreignField: "_id",
+                localField: "course",
+                as: "courseData"
             }
-            ])
+        },
+        { $unwind: "$courseData" },
+        {
+            $project: {
+                _id: 1,
+                name: '$studentData.name',
+                date: 1,
+                time: 1,
+                course: "$courseData.name"
+            }
+        }
+        ]
+        if (res.role === "admin") {
+            data = await Attendance.aggregate(query)
         } else {
-            data = await Attendance.find({ studentID: res.id }).populate({ path: "studentID", select: "name  -_id" })
+            data = await Attendance.aggregate(query)
         }
         return res.json(data)
     } catch (error) {
@@ -60,43 +62,44 @@ async function attendanceList(req, res) {
     }
 }
 
-const joinedList = async (req, res) => {
+const joinedList = async () => {
     try {
-        let data = []
-        if (res.role === "admin") {
-            data = await Attendance.aggregate([{
-                $lookup: {
-                    from: "users",
-                    localField: "studentID",
-                    foreignField: "_id",
-                    as: "studentData"
-                },
-
-            },
-            {
-                $unwind: "$studentData"
-            },
-            {
-                $lookup: {
-                    from: "courses",
-                    foreignField: "_id",
-                    localField: "course",
-                    as: "courseData"
-                }
-            },
-            { $unwind: "$courseData" },
-            {
-                $project: {
-                    _id: 1,
-                    name: '$studentData.name',
-                    date: 1,
-                    time: 1,
-                    course: "$courseData.name"
-                }
+        const data = await Attendance.aggregate([{
+            $match: {
+                date: new Date().toLocaleDateString()
             }
-            ])
+        }, {
+            $lookup: {
+                from: "users",
+                localField: "studentID",
+                foreignField: "_id",
+                as: "studentData"
+            },
+
+        },
+        {
+            $unwind: "$studentData"
+        },
+        {
+            $lookup: {
+                from: "courses",
+                foreignField: "_id",
+                localField: "course",
+                as: "courseData"
+            }
+        },
+        { $unwind: "$courseData" },
+        {
+            $project: {
+                _id: 1,
+                name: '$studentData.name',
+                date: 1,
+                time: 1,
+                course: "$courseData.name"
+            }
         }
-        return res.json(data)
+        ])
+        return data
     } catch (error) {
         return res.status(500).json({ message: error?.message })
     }

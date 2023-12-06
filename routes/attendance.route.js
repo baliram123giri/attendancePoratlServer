@@ -1,10 +1,9 @@
 const { addAttendance, attendanceList, joinedList } = require("../controllers/attendance/attendance.controller")
-const { authSign } = require("../utils/auth.util")
+const { authSign, authorize } = require("../utils/auth.util")
 
 const router = require("express").Router()
 
-router.post(`/create`, authSign, addAttendance)
-router.get(`/list`, authSign, attendanceList)
-router.get(`/joined/list`, authSign, joinedList)
+router.post(`/create`, authorize("student"), addAttendance)
+router.get(`/list`, authorize("student"), attendanceList)
 
 module.exports = router

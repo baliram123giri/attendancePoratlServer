@@ -8,11 +8,14 @@ const path = require("path")
 async function createMeeting(req, res) {
     try {
         if (!req.body.link) return res.status(500).json({ message: "Link is required!" })
+        const isLink = await Meeting.findOne({ link: req.body.link })
+
+        if (isLink) return res.json({ message: "Link is already created" })
 
         await Meeting.create({ ...req.body, expireAt: new Date(Date.now() + 4 * 60 * 60 * 1000) })
         // const userdata = await User.find({ role: "student" }, { email: 1, name: 1, _id: 0 })
 
-        res.json({ message: "Link Created Sucessfully" })
+        return res.json({ message: "Link Created Sucessfully" })
         // try {
 
         //     for (let i = 0; i < userdata.length; i++) {
