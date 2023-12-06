@@ -17,12 +17,13 @@ app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 
 const server = http.createServer(app);
-const io = socketIO(server, {
-    cors: {
-        origin: "*",
-        credentials: true
-    },
-});
+// const io = socketIO(server, {
+//     cors: {
+//         origin: "*",
+//         credentials: true
+//     },
+// });
+const io = socketIO(server);
 // Set io on the app to make it accessible in the routes
 app.set('io', io);
 // Socket.io

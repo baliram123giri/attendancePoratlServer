@@ -47,14 +47,16 @@ function verifyAccessToken(token) {
 }
 
 // Set a cookie with the access token
-function setAccessTokenCookie(res, token, exipre = 2 * 24 * 60 * 60 * 1000,) {
-
+function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
+    const twoDaysFromNow = new Date();
+    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
     return res.cookie('access_token', token, {
         maxAge: exipre, // 2 days in milliseconds
+        expires: twoDaysFromNow,
+        secure: true,
         httpOnly: true,
         sameSite: 'None',
-        secure: true,
-
+        domain: ".bgtechub.com"
     });
 
 }
