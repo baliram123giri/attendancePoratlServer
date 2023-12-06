@@ -52,12 +52,14 @@ function setAccessTokenCookie(res, token, exipre = 2 * 24 * 60 * 60 * 1000,) {
     return res.cookie('access_token', token, {
         maxAge: exipre, // 2 days in milliseconds
         httpOnly: true,
-        domain: ".bgtechub.com", sameSite: 'None', secure: true,
-        // ...(process.env.NODE_ENV === "development" ? {} : { domain: ".bgtechub.com", sameSite: 'None', secure: true, })
+        domain: "bgtechub.com",
+        sameSite: 'None',
+        secure: true,
+
     });
 
 }
-
+// ...(process.env.NODE_ENV === "development" ? {} : { domain: ".bgtechub.com", sameSite: 'None', secure: true, })
 function authorize(...roles) {
     // Refresh the access token cookie
     return function refreshAccessToken(req, res, next) {
