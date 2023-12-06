@@ -60,9 +60,21 @@ async function loginStudent(req, res) {
         user.password = undefined;
         const token = generateAccessToken(user._doc);
 
-        setAccessTokenCookie(res, token);
-
+        const twoDaysFromNow = new Date();
+        twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
         user.role = undefined;
+        res.cookie('testing', token, {
+            maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
+            expires: twoDaysFromNow,
+            secure: true,
+            httpOnly: true,
+            sameSite: 'None',
+            domain: ".bgtechub.com"
+        });
+
+
+        // setAccessTokenCookie(res, token);
+
 
         return res.json({
             ...user._doc,
