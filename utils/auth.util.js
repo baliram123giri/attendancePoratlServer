@@ -53,14 +53,12 @@ function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
     return res.cookie('access_token', token, {
         maxAge: exipre, // 2 days in milliseconds
         expires: twoDaysFromNow,
-        secure: true,
         httpOnly: true,
-        sameSite: 'None',
-        domain: ".bgtechub.com"
+        ...(process.env.NODE_ENV === "development" ? {} : { domain: ".bgtechub.com", sameSite: 'None', secure: true, })
     });
 
 }
-// ...(process.env.NODE_ENV === "development" ? {} : { domain: ".bgtechub.com", sameSite: 'None', secure: true, })
+
 function authorize(...roles) {
     // Refresh the access token cookie
     return function refreshAccessToken(req, res, next) {
@@ -86,7 +84,7 @@ function authorize(...roles) {
         const newToken = generateAccessToken(rest);
         setAccessTokenCookie(res, newToken);
         if (!roles.includes(rest.role) && rest.role !== "admin") {
-            return res.status(401).json(`${rest.role} user dosn't have the permission!!`);
+            return res.status(401).json({ message: `${rest.role} user dosn't have the permission!!` });
         }
         else {
             next()
@@ -109,4 +107,19 @@ function deleteFiles(req) {
     }
 }
 
-module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles }
+function getTimeAndDate(type = "date") {
+    const date = new Date()
+    if (type === "date") {
+        const day = date.getDate()
+        const month = date.getMonth() + 1
+        const year = date.getFullYear()
+        return `${day < 10 ? `0${day}` : day}/${month < 10 ? `0${month}` : month}/${year}`
+    } else {
+        let hours = date.getHours()
+        const minutes = date.getMinutes()
+        hours = hours % 12 || 12
+        return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes} ${date.getHours() >= 12 ? "PM" : "AM"}`
+    }
+}
+
+module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate }

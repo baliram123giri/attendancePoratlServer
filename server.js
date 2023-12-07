@@ -7,6 +7,9 @@ const http = require('http');
 const socketIO = require('socket.io');
 const { Attendance } = require("./models/attendance.model")
 const { joinedList } = require("./controllers/attendance/attendance.controller")
+const { getTimeAndDate } = require("./utils/auth.util")
+const { findMeetingsByToday } = require("./controllers/meeting/meeting.controller")
+const { Meeting } = require("./models/meeting.model")
 require("dotenv").config()
 //import db
 require("./db/db")
@@ -27,17 +30,21 @@ const io = socketIO(server, {
 app.set('io', io);
 // Socket.io
 io.on('connection', (socket) => {
-    // console.log('A user connected');
     // Handle socket events here
-    socket.on("allAttendance", async (data) => {
+    socket.on("allAttendance", async () => {
         const result = await joinedList()
         io.emit("allAttendance", result)
+    })
+
+    //create a meeting link 
+    socket.on("meeting", async () => {
+        const result = await findMeetingsByToday()
+        io.emit("meeting", result)
     })
     socket.on('disconnect', () => {
 
     });
 });
-
 
 app.use("/api/v1/user", require("./routes/auth.routes"))
 app.use("/api/v1/course", require("./routes/course.route"))

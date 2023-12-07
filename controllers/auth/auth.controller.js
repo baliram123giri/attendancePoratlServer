@@ -7,6 +7,7 @@ const {
     generateAccessToken,
     setAccessTokenCookie,
 } = require("../../utils/auth.util");
+const { Attendance } = require("../../models/attendance.model");
 //create user
 async function createStudent(req, res) {
     const session = await mongoose.startSession();
@@ -22,11 +23,11 @@ async function createStudent(req, res) {
 
         //if not  create a user but before that create user address and track in dtl => data transaction language
 
-        const addressResult = await Address.create([address], { session });
+        const addressResult = address ? await Address.create([address], { session }) : null;
         //now add user
         //hash password
         const password = await hash(rest.password, 10);
-        await User.create([{ ...rest, password, address: addressResult[0]._id }], {
+        await User.create([{ ...rest, password, ...(addressResult ? { address: addressResult[0]._id } : {}) }], {
             session,
         });
         await session.commitTransaction();
@@ -61,8 +62,6 @@ async function loginStudent(req, res) {
         const token = generateAccessToken(user._doc);
 
         setAccessTokenCookie(res, token);
-
-        user.role = undefined;
 
         return res.json({
             ...user._doc,
@@ -110,6 +109,11 @@ async function deleteUser(req, res) {
     try {
         const { id } = req.params
         if (!id) return res.status(500).json({ message: "user id required!" })
+        const user = await User.findById(id)
+        if (!user) return res.status(500).json({ message: "User not found" });
+        //delete user adreess realted data
+        await Address.findByIdAndDelete(user.address)
+        await Attendance.deleteMany({ studentID: user._id })
         await User.findByIdAndDelete(id)
         return res.json({ message: "User Deleted Successfully..." })
     } catch (error) {

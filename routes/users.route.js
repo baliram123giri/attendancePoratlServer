@@ -5,7 +5,7 @@ const router = require('express').Router()
 
 router.get('/list', usersList)
 router.delete('/delete/:id', authorize("admin"), deleteUser)
-router.get('/logout', authorize("admin"), (req, res) => {
+router.get('/logout', authorize("admin", "student"), (req, res) => {
     try {
         setAccessTokenCookie(res, "", 1)
         return res.json({ message: "logout successfully..." })
