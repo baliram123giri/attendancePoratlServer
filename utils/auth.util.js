@@ -35,7 +35,7 @@ const jwt = require('jsonwebtoken');
 const fs = require("fs");
 // Generate an access token
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 2 * 24 * 60 * 60 * 1000 });
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "2d" });
 }
 
 // Verify the access token
@@ -54,7 +54,7 @@ function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
         maxAge: exipre, // 2 days in milliseconds
         expires: twoDaysFromNow,
         httpOnly: true,
-        ...(process.env.NODE_ENV === "development" ? {} : { domain:".bgtechub.com",sameSite: 'None', secure: true, })
+        ...(process.env.NODE_ENV === "development" ? {} : { domain: ".bgtechub.com", sameSite: 'None', secure: true, })
     });
 
 }
@@ -124,7 +124,7 @@ function deleteFiles(req) {
 
 function getTimeAndDate(type = "date", locale = "en-IN", timezone = "Asia/Kolkata") {
     const date = new Date();
-  
+
     if (type === "date") {
         return date.toLocaleString(locale, {
             day: '2-digit',
@@ -139,7 +139,7 @@ function getTimeAndDate(type = "date", locale = "en-IN", timezone = "Asia/Kolkat
             hour12: true,
             timeZone: timezone
         });
-        
+
         return timeFormat;
     }
 }
