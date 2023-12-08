@@ -54,7 +54,7 @@ function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
         maxAge: exipre, // 2 days in milliseconds
         expires: twoDaysFromNow,
         httpOnly: true,
-        ...(process.env.NODE_ENV === "development" ? {} : { domain: ".app.localhost", sameSite: 'None', secure: true, })
+        ...(process.env.NODE_ENV === "development" ? {} : { domain: "localhost.org", sameSite: 'None', secure: true, })
     });
 
 }
