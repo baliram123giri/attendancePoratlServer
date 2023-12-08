@@ -35,7 +35,7 @@ const jwt = require('jsonwebtoken');
 const fs = require("fs");
 // Generate an access token
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '58m' });
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 2 * 24 * 60 * 60 * 1000 });
 }
 
 // Verify the access token
