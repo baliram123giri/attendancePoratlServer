@@ -35,7 +35,7 @@ const jwt = require('jsonwebtoken');
 const fs = require("fs");
 // Generate an access token
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "2d" });
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '58m' });
 }
 
 // Verify the access token
@@ -53,8 +53,10 @@ function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
     return res.cookie('access_token', token, {
         maxAge: exipre, // 2 days in milliseconds
         expires: twoDaysFromNow,
+        secure: true,
         httpOnly: true,
-        ...(process.env.NODE_ENV === "development" ? {} : { domain: ".bgtechub.com", sameSite: 'None', secure: true, })
+        sameSite: 'None',
+        domain: ".bgtechub.com"
     });
 
 }
