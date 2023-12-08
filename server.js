@@ -16,7 +16,7 @@ require("./db/db")
 const PORT = process.env.PORT || 4000
 //middlewres
 app.use(cookieParser())
-app.use(cors({ origin: true, credentials: true }))
+app.use(cors({ origin: true, credentials: true,  }))
 app.use(express.json())
 
 const server = http.createServer(app);
