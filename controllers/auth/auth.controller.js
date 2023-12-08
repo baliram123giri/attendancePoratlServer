@@ -89,13 +89,15 @@ async function usersList(req, res) {
                 },
             },
             {
-                $unwind: "$addressData",
+                $unwind: {
+                    path: "$addressData",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $project: {
                     password: 0,
                     __v: 0,
-                    role: 0
                 }
             }
         ]);

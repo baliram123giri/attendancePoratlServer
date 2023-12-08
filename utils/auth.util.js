@@ -107,19 +107,44 @@ function deleteFiles(req) {
     }
 }
 
-function getTimeAndDate(type = "date") {
-    const date = new Date()
+// function getTimeAndDate(type = "date") {
+//     const date = new Date()
+//     if (type === "date") {
+//         const day = date.getDate()
+//         const month = date.getMonth() + 1
+//         const year = date.getFullYear()
+//         return `${day < 10 ? `0${day}` : day}/${month < 10 ? `0${month}` : month}/${year}`
+//     } else {
+//         let hours = date.getHours()
+//         const minutes = date.getMinutes()
+//         hours = hours % 12 || 12
+//         return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes} ${date.getHours() >= 12 ? "PM" : "AM"}`
+//     }
+// }
+
+function getTimeAndDate(type = "date", locale = "en-IN", timezone = "Asia/Kolkata") {
+    const date = new Date();
+  
     if (type === "date") {
-        const day = date.getDate()
-        const month = date.getMonth() + 1
-        const year = date.getFullYear()
-        return `${day < 10 ? `0${day}` : day}/${month < 10 ? `0${month}` : month}/${year}`
+        return date.toLocaleString(locale, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: timezone
+        });
     } else {
-        let hours = date.getHours()
-        const minutes = date.getMinutes()
-        hours = hours % 12 || 12
-        return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes} ${date.getHours() >= 12 ? "PM" : "AM"}`
+        const timeFormat = date.toLocaleString(locale, {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: timezone
+        });
+        
+        return timeFormat;
     }
 }
+
+
+
 
 module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate }
