@@ -58,7 +58,7 @@ function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
     });
 
 }
-
+console.log(process.env.NODE_ENV)
 function authorize(...roles) {
     // Refresh the access token cookie
     return function refreshAccessToken(req, res, next) {
