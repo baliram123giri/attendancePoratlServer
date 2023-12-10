@@ -1,13 +1,14 @@
 const { default: mongoose } = require("mongoose")
 const { Attendance } = require("../../models/attendance.model")
-const { getTimeAndDate } = require("../../utils/auth.util")
+const { getTimeAndDate, converDateYYMMDD } = require("../../utils/auth.util")
 const { attendanceCreateSchema } = require("./validation")
+const { User } = require("../../models/user.model")
 
 async function addAttendance(req, res) {
     try {
         await attendanceCreateSchema.validateAsync(req.body)
         //find attendance
-        const isAttended = await Attendance.findOne({ ...req.body, studentID: res.id })
+        const isAttended = await Attendance.findOne({ ...req.body, date: getTimeAndDate() })
         if (isAttended) return res.status(500).json({ message: "attendance already updated!" })
         await Attendance.create({ ...req.body, date: getTimeAndDate(), studentID: res.id, time: `${getTimeAndDate("time")}` })
         return res.json({ message: "Attendance updated successfully" })
@@ -19,7 +20,7 @@ async function addAttendance(req, res) {
 
 async function attendanceList(req, res) {
     try {
-        if (!req.params.month || !req.params.year) return res.status(500).json({ message: "Month and year is required as params value" })
+        if ((!req.params.month || !req.params.year) && res.role !== "admin") return res.status(500).json({ message: "Month and year is required as params value" })
         let data = []
 
         const query = [...(res.role !== "admin" ? [{
@@ -47,7 +48,8 @@ async function attendanceList(req, res) {
             }
         },
         { $unwind: "$courseData" },
-        {
+        //if request from students
+        ...(res.role !== "admin" ? [{
             $addFields: {
                 month: { $month: { $dateFromString: { dateString: "$date", format: "%d/%m/%Y" } } },
                 year: { $year: { $dateFromString: { dateString: "$date", format: "%d/%m/%Y" } } },
@@ -58,7 +60,18 @@ async function attendanceList(req, res) {
                 month: parseInt(req.params.month),
                 year: parseInt(req.params.year)
             }
-        },
+        }] :
+            //if request from admin
+            [
+                {
+                    $match: {
+                        date: {
+                            $gte: new Date(converDateYYMMDD(req.query.startDate)),
+                            $lte: new Date(converDateYYMMDD(req.query.endDate))
+                        }
+                    }
+                }
+            ]),
         {
             $project: {
                 _id: 1,
@@ -71,7 +84,10 @@ async function attendanceList(req, res) {
         }
         ]
         if (res.role === "admin") {
-            data = await Attendance.aggregate(query)
+            const usersResult = await User.find({ role: "student" })
+            const attendanceResult = await Attendance.aggregate(query)
+
+            data = attendanceResult
         } else {
             data = await Attendance.aggregate(query)
         }

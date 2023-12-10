@@ -21,26 +21,26 @@ async function createMeeting(req, res) {
         await Meeting.create({ ...req.body, date: getTimeAndDate(), time: getTimeAndDate("time"), expireAt: new Date(Date.now() + expireInMinutes * 60 * 1000) })
         // const userdata = await User.find({ role: "student" }, { email: 1, name: 1, _id: 0 })
 
-        return res.json({ message: "Link Created Sucessfully" })
-        // try {
-        //     for (let i = 0; i < userdata.length; i++) {
-        //         const data = { name: userdata[i].name }
-        //         await ejs.renderFile(path.join(__dirname, "../../mails/meeting-email.ejs"), data)
-        //         await sendEmail({
-        //             email: userdata[i].email,
-        //             subject: "Join Live class",
-        //             template: "meeting-email.ejs",
-        //             data
-        //         })
-        //     }
+
+        try {
+            for (let i = 0; i < userdata.length; i++) {
+                const data = { name: userdata[i].name }
+                await ejs.renderFile(path.join(__dirname, "../../mails/meeting-email.ejs"), data)
+                await sendEmail({
+                    email: userdata[i].email,
+                    subject: "Join Live class",
+                    template: "meeting-email.ejs",
+                    data
+                })
+            }
 
         //     // console.log(data)
-        //     res.json({ message: "Link Created Sucessfully" })
+        return res.json({ message: "Link Created Sucessfully" })
 
-        // } catch (error) {
-        //     res.status(500).json({ message: error?.message })
-        // }
-
+        } catch (error) {
+            res.status(500).json({ message: error?.message })
+        }
+     
 
     } catch (error) {
         return res.status(500).json({ message: error?.message })

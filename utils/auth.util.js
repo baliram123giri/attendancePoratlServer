@@ -35,7 +35,7 @@ const jwt = require('jsonwebtoken');
 const fs = require("fs");
 // Generate an access token
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '58m' });
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '2d' });
 }
 
 // Verify the access token
@@ -53,14 +53,14 @@ function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
     return res.cookie('access_token', token, {
         maxAge: exipre, // 2 days in milliseconds
         expires: twoDaysFromNow,
-        secure: true,
         httpOnly: true,
+        secure: true,
         sameSite: 'None',
         domain: ".bgtechub.com"
     });
 
 }
-console.log(process.env.NODE_ENV)
+
 function authorize(...roles) {
     // Refresh the access token cookie
     return function refreshAccessToken(req, res, next) {
@@ -85,7 +85,7 @@ function authorize(...roles) {
         res.role = rest.role
         const newToken = generateAccessToken(rest);
         setAccessTokenCookie(res, newToken);
-        if (!roles.includes(rest.role) && rest.role !== "admin") {
+        if (!roles.includes(rest.role)) {
             return res.status(401).json({ message: `${rest.role} user dosn't have the permission!!` });
         }
         else {
@@ -147,6 +147,9 @@ function getTimeAndDate(type = "date", locale = "en-IN", timezone = "Asia/Kolkat
 }
 
 
+ function converDateYYMMDD(date) {
+    return date.split("/").reverse().join("-")
+}
 
 
-module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate }
+module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate , converDateYYMMDD}
