@@ -8,7 +8,7 @@ async function addAttendance(req, res) {
     try {
         await attendanceCreateSchema.validateAsync(req.body)
         //find attendance
-        const isAttended = await Attendance.findOne({ ...req.body, date: getTimeAndDate() })
+        const isAttended = await Attendance.findOne({ ...req.body, date: getTimeAndDate(), studentID: res.id })
         if (isAttended) return res.status(500).json({ message: "attendance already updated!" })
         await Attendance.create({ ...req.body, date: getTimeAndDate(), studentID: res.id, time: `${getTimeAndDate("time")}` })
         return res.json({ message: "Attendance updated successfully" })
