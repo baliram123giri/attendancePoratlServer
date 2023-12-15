@@ -1,4 +1,4 @@
-const { createChat, findusersChat, findChat } = require("../Controllers/chats/chatsController")
+const { createChat, findusersChat, findChat } = require("../controllers/chats/chats.controller")
 
 const router = require("express").Router()
 
