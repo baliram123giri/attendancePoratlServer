@@ -1,9 +1,11 @@
-const { usersList, deleteUser } = require('../controllers/auth/auth.controller')
+const { usersList, deleteUser, friendsList, findUser } = require('../controllers/auth/auth.controller')
 const { authorize, setAccessTokenCookie } = require('../utils/auth.util')
 
 const router = require('express').Router()
 
 router.get('/list', usersList)
+router.get('/friends/list', friendsList)
+router.get('/find/:id', findUser)
 router.delete('/delete/:id', authorize("admin"), deleteUser)
 router.get('/logout', authorize("admin", "student"), (req, res) => {
     try {

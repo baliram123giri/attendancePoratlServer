@@ -106,6 +106,24 @@ async function usersList(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
+//find user
+async function findUser(req, res) {
+    try {
+        const result = await User.findById(req.params.id).select(["name"])
+        return res.json(result)
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+//friends  list
+async function friendsList(req, res) {
+    try {
+        const result = await User.find({ role: "student" }).select(["name", "email"])
+        return res.json(result)
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
 
 async function deleteUser(req, res) {
     try {
@@ -122,4 +140,4 @@ async function deleteUser(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
-module.exports = { createStudent, loginStudent, usersList, deleteUser };
+module.exports = { createStudent, loginStudent, usersList, deleteUser, friendsList, findUser };

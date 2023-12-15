@@ -7,6 +7,7 @@ const AttendanceSchema = new mongoose.Schema({
     time: {
         type: String
     },
+    timeStamp: Date,
     course: { type: mongoose.Schema.ObjectId, ref: "Course" }
 })
 

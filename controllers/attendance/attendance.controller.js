@@ -3,14 +3,14 @@ const { Attendance } = require("../../models/attendance.model")
 const { getTimeAndDate, converDateYYMMDD } = require("../../utils/auth.util")
 const { attendanceCreateSchema } = require("./validation")
 const { User } = require("../../models/user.model")
-
+const moment = require('moment');
 async function addAttendance(req, res) {
     try {
         await attendanceCreateSchema.validateAsync(req.body)
         //find attendance
         const isAttended = await Attendance.findOne({ ...req.body, date: getTimeAndDate(), studentID: res.id })
         if (isAttended) return res.status(500).json({ message: "attendance already updated!" })
-        await Attendance.create({ ...req.body, date: getTimeAndDate(), studentID: res.id, time: `${getTimeAndDate("time")}` })
+        await Attendance.create({ ...req.body, date: getTimeAndDate(), timeStamp: new Date(getTimeAndDate()), studentID: res.id, time: `${getTimeAndDate("time")}` })
         return res.json({ message: "Attendance updated successfully" })
 
     } catch (error) {
@@ -22,6 +22,9 @@ async function attendanceList(req, res) {
     try {
         if ((!req.params.month || !req.params.year) && res.role !== "admin") return res.status(500).json({ message: "Month and year is required as params value" })
         let data = []
+        // / Convert string dates to ISO date strings using moment.js
+        var startDate = new Date(converDateYYMMDD(req.query.startDate));
+        var endDate = new Date(converDateYYMMDD(req.query.endDate));
 
         const query = [...(res.role !== "admin" ? [{
             $match: {
@@ -65,9 +68,9 @@ async function attendanceList(req, res) {
             [
                 {
                     $match: {
-                        date: {
-                            $gte: new Date(converDateYYMMDD(req.query.startDate)),
-                            $lte: new Date(converDateYYMMDD(req.query.endDate))
+                        timeStamp: {
+                            $gte: startDate,
+                            $lte: endDate
                         }
                     }
                 }
@@ -84,7 +87,7 @@ async function attendanceList(req, res) {
         }
         ]
         if (res.role === "admin") {
-            const usersResult = await User.find({ role: "student" })
+            // const usersResult = await User.find({ role: "student" })
             const attendanceResult = await Attendance.aggregate(query)
 
             data = attendanceResult
@@ -93,6 +96,7 @@ async function attendanceList(req, res) {
         }
         return res.json(data)
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: error?.message })
     }
 }

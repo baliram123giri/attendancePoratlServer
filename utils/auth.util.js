@@ -35,7 +35,7 @@ const jwt = require('jsonwebtoken');
 const fs = require("fs");
 // Generate an access token
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '2d' });
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1d' });
 }
 
 // Verify the access token
@@ -47,16 +47,18 @@ function verifyAccessToken(token) {
 }
 
 // Set a cookie with the access token
-function setAccessTokenCookie(res, token, exipre = (2 * 24 * 60 * 60 * 1000),) {
+function setAccessTokenCookie(res, token, exipre = (24 * 60 * 60 * 1000),) {
     const twoDaysFromNow = new Date();
-    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
+    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 1);
     return res.cookie('access_token', token, {
         maxAge: exipre, // 2 days in milliseconds
         expires: twoDaysFromNow,
         httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        domain: ".bgtechub.com"
+        ...(process.env.NODE_ENV === "development" ? {} : {
+            secure: true,
+            sameSite: 'None',
+            domain: ".bgtechub.com"
+        })
     });
 
 }
@@ -147,9 +149,9 @@ function getTimeAndDate(type = "date", locale = "en-IN", timezone = "Asia/Kolkat
 }
 
 
- function converDateYYMMDD(date) {
+function converDateYYMMDD(date) {
     return date.split("/").reverse().join("-")
 }
 
 
-module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate , converDateYYMMDD}
+module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate, converDateYYMMDD }

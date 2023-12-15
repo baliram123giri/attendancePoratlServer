@@ -5,7 +5,7 @@ async function createCourse(req, res) {
     try {
         await courseCreateSchema.validateAsync(req.body)
         //check course exist or not
-        const isCourse = await Course.findOne({ name: req.body.name })
+        const isCourse = await Course.findOne({ name: req.body.name }) 
 
         if (isCourse) return res.status(400).json({ message: `${req.body.name} with this name course already exist!` })
 
