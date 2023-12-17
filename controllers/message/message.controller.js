@@ -22,4 +22,15 @@ const getMessage = async (req, res) => {
     }
 }
 
-module.exports = { createMessage, getMessage }
+//update message
+const updateMessage = async (req, res) => {
+    try {
+        const { chatId } = req.params
+        const response = await MessageModel.updateMany({ isRead: false, chatId }, { $set: { isRead: true } })
+        return res.json(response)
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+module.exports = { createMessage, getMessage, updateMessage }

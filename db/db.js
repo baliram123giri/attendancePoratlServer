@@ -31,6 +31,9 @@ function connectDb() {
 
 
 
+//online user
+let OnlineUsers = []
+
 // Socket.io
 io.on('connection', (socket) => {
     // Handle socket events here
@@ -62,9 +65,30 @@ io.on('connection', (socket) => {
     socket.on("getMessage", () => {
 
     })
+    //getNotification
+    socket.on("getNotification", () => {
+
+    })
+
+    //isMessageSeen
+    socket.on("messageSeen", () => {
+
+    })
+
+
+    //get online users
+    socket.on("onlineUsers", (user) => {
+
+        if (!OnlineUsers.some(({ userId }) => userId === user?._id)) {
+            OnlineUsers.push({ socketId: socket.id, userId: user?._id })
+            //send userId
+            io.emit("onlineUsers", OnlineUsers)
+        }
+    })
 
     socket.on('disconnect', () => {
-
+        OnlineUsers = OnlineUsers.filter(({ socketId }) => socketId !== socket.id)
+        io.emit("onlineUsers", OnlineUsers)
     });
 });
 
@@ -100,10 +124,27 @@ MessageModel.watch().on("change", (event) => {
         try {
             //send to the client
             io.emit("getMessage", event?.fullDocument);
+            //get notification
+            io.emit("getNotification", {
+                senderId: event?.fullDocument?.senderId,
+                isRead: false,
+                date: new Date()
+            })
         } catch (error) {
             console.error("Error handling change event:", error);
         }
     }
+    if (event.operationType === "update") {
+        // console.log(event)
+        const { documentKey: { _id } } = event
+        io.emit("messageSeen", {
+            _id,
+            isRead: true,
+            date: new Date()
+        })
+    }
 })
+
+
 
 module.exports = { connectDb, server, app, express }
