@@ -34,6 +34,17 @@ const updateMessage = async (req, res) => {
     }
 }
 
+//delete message
+const deleteMessage = async (req, res) => {
+    try {
+        const { id } = req.params
+        const response = await MessageModel.deleteOne({ _id: id })
+        return res.json(response)
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
+
 //get user notifications
 const getNotification = async (req, res) => {
     try {
@@ -44,4 +55,4 @@ const getNotification = async (req, res) => {
     }
 }
 
-module.exports = { createMessage, getMessage, updateMessage, getNotification }
+module.exports = { createMessage, getMessage, updateMessage, getNotification, deleteMessage }
