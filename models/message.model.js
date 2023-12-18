@@ -1,7 +1,11 @@
 const mongoose = require("mongoose")
 const MessageSchema = new mongoose.Schema({
     chatId: String,
-    senderId: String,
+    senderId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User"
+    },
+    receiverId: String,
     text: String,
     isRead: {
         type: Boolean,

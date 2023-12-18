@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
 
     })
 
-    //isMessageSeen
+    //isMessageSeen 
     socket.on("messageSeen", () => {
 
     })
@@ -111,6 +111,7 @@ ChatModel.watch().on("change", (event) => {
     if (event.operationType === "insert") {
         try {
             //send to the client
+            io.emit("addChat", event.fullDocument);
             io.emit("getMessage", event.fullDocument);
         } catch (error) {
             console.error("Error handling change event:", error);
@@ -119,17 +120,14 @@ ChatModel.watch().on("change", (event) => {
 });
 
 //message model
-MessageModel.watch().on("change", (event) => {
+MessageModel.watch().on("change", async (event) => {
     if (event.operationType === "insert") {
         try {
             //send to the client
             io.emit("getMessage", event?.fullDocument);
             //get notification
-            io.emit("getNotification", {
-                senderId: event?.fullDocument?.senderId,
-                isRead: false,
-                date: new Date()
-            })
+            const user = await User.find({ _id: event?.fullDocument?.senderId })
+            io.emit("getNotification", { ...event?.fullDocument, senderId: { name: user[0].name, _id: user[0]._id } })
         } catch (error) {
             console.error("Error handling change event:", error);
         }
