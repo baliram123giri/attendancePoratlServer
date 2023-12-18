@@ -37,7 +37,7 @@ const updateMessage = async (req, res) => {
 //get user notifications
 const getNotification = async (req, res) => {
     try {
-        const response = await MessageModel.find({ receiverId: req.params.userId, isRead: false }).populate("senderId", ["name"])
+        const response = await MessageModel.find({ receiverId: req.params.userId, isRead: false }).populate("senderId", ["name"]).sort({ createdAt: -1 })
         return res.json(response)
     } catch (error) {
         return res.status(500).json({ message: error.message })
