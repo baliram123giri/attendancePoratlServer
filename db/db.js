@@ -65,6 +65,11 @@ io.on('connection', (socket) => {
     socket.on("getMessage", () => {
 
     })
+
+    //DeleteMessage
+    socket.on("deleteMessage", () => {
+
+    })
     //getNotification
     socket.on("getNotification", () => {
 

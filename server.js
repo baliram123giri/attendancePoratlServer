@@ -20,6 +20,7 @@ app.use("/api/v1/meeting", require("./routes/meeting.route"))
 app.use("/api/v1/users", require("./routes/users.route"))
 app.use("/api/v1/chats", require("./routes/chatRoutes"))
 app.use("/api/v1/messages", require("./routes/messageRoutes"))
+app.use("/api/v1/assignment", require("./routes/assignments.route"))
 
 //not found err
 app.use((req, res) => {

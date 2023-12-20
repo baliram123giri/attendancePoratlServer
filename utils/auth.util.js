@@ -150,7 +150,7 @@ function getTimeAndDate(type = "date", locale = "en-IN", timezone = "Asia/Kolkat
 
 
 function converDateYYMMDD(date) {
-    return date.split("/").reverse().join("-")
+    return date?.split("/").reverse().join("-")
 }
 
 
