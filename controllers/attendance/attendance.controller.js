@@ -10,7 +10,7 @@ async function addAttendance(req, res) {
         //find attendance
         const isAttended = await Attendance.findOne({ ...req.body, date: getTimeAndDate(), studentID: res.id })
         if (isAttended) return res.status(500).json({ message: "attendance already updated!" })
-        await Attendance.create({ ...req.body, date: getTimeAndDate(), timeStamp: new Date(getTimeAndDate()), studentID: res.id, time: `${getTimeAndDate("time")}` })
+        await Attendance.create({ ...req.body, date: getTimeAndDate(), studentID: res.id, time: `${getTimeAndDate("time")}` })
         return res.json({ message: "Attendance updated successfully" })
 
     } catch (error) {
