@@ -1,7 +1,6 @@
 // const { } = require("../controllers/assignments/assignments.controller")
 const router = require("express").Router()
 const multer = require('multer');
-const sharp = require('sharp');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const { assignmentCreateSchema } = require("../controllers/assignments/validation");
@@ -27,10 +26,10 @@ router.post('/create', authorize("student"), upload.single('thumbnail'), async (
         await assignmentCreateSchema.validateAsync(req.body)
         const { gitUrl, title, netlifyUrl } = req.body
         // Compress and resize the image
-        const processedImageBuffer = await sharp(req.file.buffer)
-            .jpeg({ quality: 80 })
-            .resize({ width: 500, height: 500, fit: 'inside' })
-            .toBuffer();
+        // const processedImageBuffer = await sharp(req.file.buffer)
+        //     .jpeg({ quality: 80 })
+        //     .resize({ width: 500, height: 500, fit: 'inside' })
+        //     .toBuffer();
         const assignmentResult = await Assignments.create({ gitUrl, netlifyUrl, title, userId: res?.id })
 
         const publicId = `${String(assignmentResult?._id)}`;
@@ -50,7 +49,7 @@ router.post('/create', authorize("student"), upload.single('thumbnail'), async (
                 res.json({ message: "Assignment Created Successfully" });
 
             }
-        ).end(processedImageBuffer);
+        ).end(req.file.buffer);
 
     } catch (error) {
         console.error('Error processing image:', error.message);
@@ -78,10 +77,10 @@ router.put("/update/:id", authorize("student"), upload.single('thumbnail'), asyn
         if (!assignment) return res.status(400).json({ message: "Assignment not found" })
         if (req?.file) {
             // Compress and resize the new image
-            const processedImageBuffer = await sharp(req.file.buffer)
-                .jpeg({ quality: 80 })
-                .resize({ width: 320, height: 300, fit: 'inside' })
-                .toBuffer();
+            // const processedImageBuffer = await sharp(req.file.buffer)
+            //     .jpeg({ quality: 80 })
+            //     .resize({ width: 320, height: 300, fit: 'inside' })
+            //     .toBuffer();
 
             // Explicitly set the public ID for Cloudinary upload
             const publicId = `${req.params.id}`;
@@ -106,7 +105,7 @@ router.put("/update/:id", authorize("student"), upload.single('thumbnail'), asyn
                     // Respond with a success message
                     res.json({ message: "Assignment Updated Successfully" });
                 }
-            ).end(processedImageBuffer);
+            ).end(req.file.buffer);
         } else {
             // If no new image is provided, update assignment details without changing the image
             await Assignments.findByIdAndUpdate(req.params.id, {
