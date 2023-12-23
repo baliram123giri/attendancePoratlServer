@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const MessageSchema = new mongoose.Schema({
+    _id: String,
     chatId: String,
     senderId: {
         type: mongoose.Schema.ObjectId,
@@ -10,9 +11,12 @@ const MessageSchema = new mongoose.Schema({
     isRead: {
         type: Boolean,
         default: false
-    }
-}, {
-    timestamps: true
+    },
+    docs: {
+        type: String,
+        default: ""
+    },
+    createdAt: { type: Date, expires: 3600 }
 })
 
 const MessageModel = mongoose.model("Message", MessageSchema)

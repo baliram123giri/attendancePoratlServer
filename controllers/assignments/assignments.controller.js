@@ -2,9 +2,20 @@ const { Assignments } = require("../../models/assignment.mode")
 
 const getAllAssignments = async (req, res) => {
     try {
+        const pageNo = parseInt(req.query?.page) || 1
+        const limit = req?.query?.limit || 10
+        const totalItems = res.role === "admin" ? await Assignments.countDocuments() : await Assignments.countDocuments({ userId: res?.id })
+        const totalPages = Math.ceil(totalItems / limit)
+        const data = res.role === "admin" ? await Assignments.find().skip((pageNo - 1) * limit).limit(limit).exec() : await Assignments.find({ userId: res?.id }).skip((pageNo - 1) * limit).limit(limit).exec()
 
-        const results = res.role === "admin" ? await Assignments.find() : await Assignments.find({ userId: res?.id })
-        return res.json(results)
+        const metadata = {
+            totalItems,
+            totalPages,
+            currentPage: pageNo,
+            itemsPerPage: limit,
+        };
+
+        return res.json({ data, metadata })
 
     } catch (error) {
         return res.status(500).json({ message: error?.message })

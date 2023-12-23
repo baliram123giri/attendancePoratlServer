@@ -5,7 +5,7 @@ const AssigmentsSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.ObjectId, ref: "User" },
     gitUrl: String,
     netlifyUrl: String,
-    thumbnail: String
+    thumbnail: String,
 }, { timestamps: true })
 
 

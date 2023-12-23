@@ -8,6 +8,14 @@ const socketIO = require('socket.io');
 const { findMeetingsByToday } = require("../controllers/meeting/meeting.controller");
 const { joinedList } = require("../controllers/attendance/attendance.controller");
 const { MessageModel } = require("../models/message.model");
+const { Assignments } = require("../models/assignment.mode");
+const cloudinary = require('cloudinary').v2;
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLODINARY_NAME,
+    api_key: process.env.CLODINARY_KEY,
+    api_secret: process.env.CLODINARY_SECRET,
+});
 
 const server = http.createServer(app);
 const io = socketIO(server, {

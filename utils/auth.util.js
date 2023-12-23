@@ -153,5 +153,17 @@ function converDateYYMMDD(date) {
     return date?.split("/").reverse().join("-")
 }
 
+function generateRandomId() {
+    const characters = '0123456789abcdef';
+    let randomId = '';
+  
+    for (let i = 0; i < 32; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomId += characters.charAt(randomIndex);
+    }
+  
+    return randomId;
+  }
+  
 
-module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate, converDateYYMMDD }
+module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate, converDateYYMMDD , generateRandomId}

@@ -10,9 +10,9 @@ const { getAllAssignments, getSingleAssignment } = require("../controllers/assig
 
 // Configure Cloudinary
 cloudinary.config({
-    cloud_name: 'dhlyinfwd',
-    api_key: '729467363935785',
-    api_secret: 'nQTW3NvgsrKYY9coQgodHYSRTTQ',
+    cloud_name: process.env.CLODINARY_NAME,
+    api_key: process.env.CLODINARY_KEY,
+    api_secret: process.env.CLODINARY_SECRET,
 });
 
 // Configure Multer for handling file uploads
@@ -25,17 +25,21 @@ router.post('/create', authorize("student"), upload.single('thumbnail'), async (
     try {
         await assignmentCreateSchema.validateAsync(req.body)
         const { gitUrl, title, netlifyUrl } = req.body
-        // Compress and resize the image
-        // const processedImageBuffer = await sharp(req.file.buffer)
-        //     .jpeg({ quality: 80 })
-        //     .resize({ width: 500, height: 500, fit: 'inside' })
-        //     .toBuffer();
+        // // Drop the existing TTL index
+        // await Assignments.collection.dropIndex('createdAt_1');
+        // // Ensure TTL index is created
+        // await Assignments.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 30 });
+
         const assignmentResult = await Assignments.create({ gitUrl, netlifyUrl, title, userId: res?.id })
 
         const publicId = `${String(assignmentResult?._id)}`;
         // Upload the processed image to Cloudinary
         cloudinary.uploader.upload_stream(
-            { resource_type: 'image', public_id: publicId },
+            {
+                resource_type: 'image', public_id: publicId, transformation: {
+                    quality: 'auto:low', // You can experiment with different values
+                }
+            },
             async (error, result) => {
                 if (error) {
                     await Assignments.findByIdAndDelete(assignmentResult?._id)
@@ -67,7 +71,7 @@ router.post('/create', authorize("student"), upload.single('thumbnail'), async (
     }
 });
 
-router.get("/list", authorize("student"), getAllAssignments)
+router.get("/list", authorize("student", "admin"), getAllAssignments)
 router.get("/:id", authorize("student"), getSingleAssignment)
 router.put("/update/:id", authorize("student"), upload.single('thumbnail'), async (req, res) => {
     try {
@@ -76,12 +80,6 @@ router.put("/update/:id", authorize("student"), upload.single('thumbnail'), asyn
         const assignment = await Assignments.findById(req.params.id)
         if (!assignment) return res.status(400).json({ message: "Assignment not found" })
         if (req?.file) {
-            // Compress and resize the new image
-            // const processedImageBuffer = await sharp(req.file.buffer)
-            //     .jpeg({ quality: 80 })
-            //     .resize({ width: 320, height: 300, fit: 'inside' })
-            //     .toBuffer();
-
             // Explicitly set the public ID for Cloudinary upload
             const publicId = `${req.params.id}`;
 
@@ -152,5 +150,7 @@ router.delete("/delete/:id", authorize("student"), async (req, res) => {
         return res.status(500).json({ message: error?.message })
     }
 })
+
+
 
 module.exports = router
