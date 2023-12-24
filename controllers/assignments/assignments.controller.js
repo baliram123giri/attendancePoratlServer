@@ -6,7 +6,7 @@ const getAllAssignments = async (req, res) => {
         const limit = req?.query?.limit || 10
         const totalItems = res.role === "admin" ? await Assignments.countDocuments() : await Assignments.countDocuments({ userId: res?.id })
         const totalPages = Math.ceil(totalItems / limit)
-        const data = res.role === "admin" ? await Assignments.find().skip((pageNo - 1) * limit).limit(limit).exec() : await Assignments.find({ userId: res?.id }).skip((pageNo - 1) * limit).limit(limit).exec()
+        const data = res.role === "admin" ? await Assignments.find().populate("userId", "name").skip((pageNo - 1) * limit).limit(limit).exec() : await Assignments.find({ userId: res?.id }).skip((pageNo - 1) * limit).limit(limit).exec()
 
         const metadata = {
             totalItems,

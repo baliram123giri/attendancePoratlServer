@@ -5,7 +5,7 @@ const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const { assignmentCreateSchema } = require("../controllers/assignments/validation");
 const { Assignments } = require("../models/assignment.mode");
-const { authorize } = require("../utils/auth.util");
+const { authorize, generateRandomId } = require("../utils/auth.util");
 const { getAllAssignments, getSingleAssignment } = require("../controllers/assignments/assignments.controller");
 
 // Configure Cloudinary
@@ -21,34 +21,28 @@ const upload = multer({ storage: storage });
 
 // Define the upload endpoint
 
-router.post('/create', authorize("student"), upload.single('thumbnail'), async (req, res) => {
+router.post('/create', authorize("student", "admin"), upload.single('thumbnail'), async (req, res) => {
     try {
         await assignmentCreateSchema.validateAsync(req.body)
         const { gitUrl, title, netlifyUrl } = req.body
-        // // Drop the existing TTL index
-        // await Assignments.collection.dropIndex('createdAt_1');
-        // // Ensure TTL index is created
-        // await Assignments.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 30 });
 
-        const assignmentResult = await Assignments.create({ gitUrl, netlifyUrl, title, userId: res?.id })
 
-        const publicId = `${String(assignmentResult?._id)}`;
+
+        const publicId = `${String(generateRandomId())}`;
         // Upload the processed image to Cloudinary
         cloudinary.uploader.upload_stream(
             {
                 resource_type: 'image', public_id: publicId, transformation: {
                     quality: 'auto:low', // You can experiment with different values
-                }
+                },
+                folder: "Assignment"
             },
             async (error, result) => {
                 if (error) {
-                    await Assignments.findByIdAndDelete(assignmentResult?._id)
+                    console.error('Error uploading to Cloudinary:', error.message);
                     return res.status(500).json({ error: 'Error uploading to Cloudinary', error });
                 }
-                await Assignments.findByIdAndUpdate(assignmentResult?._id, {
-                    thumbnail: result.url,
-                });
-
+                await Assignments.create({ _id: publicId, gitUrl, netlifyUrl, title, userId: res?.id, thumbnail: result.url })
                 // Respond with the Cloudinary URL of the processed image
                 res.json({ message: "Assignment Created Successfully" });
 
@@ -72,8 +66,8 @@ router.post('/create', authorize("student"), upload.single('thumbnail'), async (
 });
 
 router.get("/list", authorize("student", "admin"), getAllAssignments)
-router.get("/:id", authorize("student"), getSingleAssignment)
-router.put("/update/:id", authorize("student"), upload.single('thumbnail'), async (req, res) => {
+router.get("/:id", authorize("student", "admin"), getSingleAssignment)
+router.put("/update/:id", authorize("student", "admin"), upload.single('thumbnail'), async (req, res) => {
     try {
         const { gitUrl, title, netlifyUrl } = req.body;
         // Check if an image was provided in the update
@@ -151,6 +145,15 @@ router.delete("/delete/:id", authorize("student"), async (req, res) => {
     }
 })
 
-
+Assignments.watch().on("change", event => {
+    if (event.operationType === "delete") {
+        try {
+            const { documentKey: { _id } } = event
+            cloudinary.api.delete_resources(`Assignment/${_id}`)
+        } catch (error) {
+            console.error("Error handling change event:", error);
+        }
+    }
+})
 
 module.exports = router

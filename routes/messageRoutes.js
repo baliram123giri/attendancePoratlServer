@@ -17,25 +17,25 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 router.post("/", upload.single('docs'), async (req, res) => {
     try {
-        const { chatId, text, senderId, receiverId } = req.body
+        const { chatId, text, senderId, receiverId, docsName } = req.body
         await MessageModel.collection.dropIndex("createdAt_1")
         await MessageModel.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 })
         const publicId = `${String(generateRandomId())}`;
 
         if (req.file) {
             //upload docs
-
             cloudinary.uploader.upload_stream({
                 resource_type: "auto",
                 public_id: publicId,
                 transformation: {
                     quality: "auto:low"
-                }
+                },
+                folder: "Chats"
             }, async (err, result) => {
                 if (err) {
                     return res.status(500).json({ error: 'Error uploading to Cloudinary', err });
                 } else {
-                    const finalResult = await MessageModel.create({ _id: publicId, chatId, text, senderId, receiverId, docs: result.url, createdAt: new Date() })
+                    const finalResult =     await MessageModel.create({ _id: publicId, chatId, text, senderId, receiverId, docs: result.url, docsName, createdAt: new Date() })
                     return res.json(finalResult)
                 }
             }).end(req.file.buffer)
@@ -58,9 +58,7 @@ MessageModel.watch().on("change", async (event) => {
     if (event.operationType === "delete") {
         try {
             const { documentKey: { _id } } = event
-            cloudinary.api.delete_resources(String(_id), () => {
-                console.log(_id, "deleted")
-            })
+            cloudinary.api.delete_resources(`Chats/${_id}`)
         } catch (error) {
             console.error("Error handling change event:", error);
         }

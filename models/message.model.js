@@ -16,6 +16,7 @@ const MessageSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    docsName: String,
     createdAt: { type: Date, expires: 3600 }
 })
 
