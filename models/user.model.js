@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema({
     mobile: Number,
     password: String,
     address: { type: mongoose.Schema.ObjectId, ref: "Address" },
+    avatar: {
+        type: String,
+        default: ""
+    },
     role: {
         type: String,
         default: "student"

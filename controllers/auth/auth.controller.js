@@ -8,6 +8,12 @@ const {
     setAccessTokenCookie,
 } = require("../../utils/auth.util");
 const { Attendance } = require("../../models/attendance.model");
+const { MessageModel } = require("../../models/message.model");
+const { ChatModel } = require("../../models/chat.model");
+const { Assignments } = require("../../models/assignment.mode");
+const { sendEmail } = require("../../utils/sendEmail.utils");
+const ejs = require("ejs")
+const path = require("path")
 //create user
 async function createStudent(req, res) {
     const session = await mongoose.startSession();
@@ -109,7 +115,7 @@ async function usersList(req, res) {
 //find user
 async function findUser(req, res) {
     try {
-        const result = await User.findById(req.params.id).select(["name"])
+        const result = await User.findById(req.params.id).select(["name", "avatar"])
         return res.json(result)
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -134,10 +140,55 @@ async function deleteUser(req, res) {
         //delete user adreess realted data
         await Address.findByIdAndDelete(user.address)
         await Attendance.deleteMany({ studentID: user._id })
+        await Assignments.deleteMany({ userId: user._id })
         await User.findByIdAndDelete(id)
+        await MessageModel.deleteMany({ senderId: id })
+        await ChatModel.deleteMany({ members: { $in: [id] } })
+
         return res.json({ message: "User Deleted Successfully..." })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
-module.exports = { createStudent, loginStudent, usersList, deleteUser, friendsList, findUser };
+
+
+
+const changePassword = async (req, res) => {
+    try {
+        const user = await User.findById(res.id)
+        if (!user) return res.status(500).json({ message: "User not found" });
+        const isVerified = compareSync(req.body.oldPassword, user?.password)
+        if (!isVerified) return res.status(500).json({ message: "User Old Password Not Matching!" })
+        const newPassword = await hash(req.body.password, 10)
+
+        await User.findByIdAndUpdate(res.id, { ...req.body, password: newPassword })
+        setAccessTokenCookie(res, "", 1)
+        return res.json({ message: "Password Updated Successfully..." })
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+//forget password
+async function forgetpassword(req, res) {
+    try {
+        const user = await User.findOne({ email: req.body.email })
+        if (!user) return res.status(500).json({ message: "User not found" });
+
+        //if user found
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "24h" })
+        const data = { name: user.name, token: `http://${process.env.NODE_ENV === "development" ? "localhost:3000" : "app.bgtechub.com"}/resetpassword/${token}` }
+        await ejs.renderFile(path.join(__dirname, "../../mails/forgetpassword.ejs"), data)
+        await sendEmail({
+            email: user.email,
+            subject: "Password Reset Request: Take Action Now",
+            template: "forgetpassword.ejs",
+            data
+        })
+        return res.json({ message: `Reset Password link has been sent on ${user?.email}` })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+module.exports = { createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword };

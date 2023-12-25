@@ -91,7 +91,6 @@ router.put("/update/:id", authorize("student", "admin"), upload.single('thumbnai
                         netlifyUrl,
                         title,
                         thumbnail: result.url,
-                        userId: res?.id,
                     });
 
                     // Respond with a success message
@@ -104,7 +103,6 @@ router.put("/update/:id", authorize("student", "admin"), upload.single('thumbnai
                 gitUrl,
                 netlifyUrl,
                 title,
-                userId: res?.id,
             });
 
             // Respond with a success message
@@ -126,7 +124,7 @@ router.put("/update/:id", authorize("student", "admin"), upload.single('thumbnai
     }
 });
 
-router.delete("/delete/:id", authorize("student"), async (req, res) => {
+router.delete("/delete/:id", authorize("student", "admin"), async (req, res) => {
     try {
         const assignment = await Assignments.findById(req.params.id)
         if (!assignment) return res.status(400).json({ message: "Assignment not found" })
