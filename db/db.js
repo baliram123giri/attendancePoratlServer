@@ -71,6 +71,10 @@ io.on('connection', (socket) => {
     socket.on("deleteMessage", () => {
 
     })
+    //delete chat
+    socket.on("deleteChat", () => {
+
+    })
     //getNotification
     socket.on("getNotification", () => {
 
@@ -123,6 +127,11 @@ ChatModel.watch().on("change", (event) => {
             console.error("Error handling change event:", error);
         }
     }
+    if (event.operationType === "delete") {
+        // console.log(event)
+        const { documentKey: { _id } } = event
+        io.emit("deleteChat", _id)
+    }
 });
 
 //message model
@@ -146,6 +155,11 @@ MessageModel.watch().on("change", async (event) => {
             isRead: true,
             date: new Date()
         })
+    }
+    if (event.operationType === "delete") {
+        // console.log(event)
+        const { documentKey: { _id } } = event
+        io.emit("deleteMessage", _id)
     }
 })
 
