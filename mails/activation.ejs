@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forget Password Email</title>
+    <title>Account Activation</title>
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -26,7 +26,7 @@
       }
 
       p {
-        color: #555;
+        color: #666;
       }
 
       .btn {
@@ -37,34 +37,24 @@
         text-decoration: none;
         border-radius: 5px;
       }
-      .name {
-        font-weight: 600;
-      }
-      @media only screen and (max-width: 600px) {
-        .container {
-          width: 100%;
-        }
-      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>Forget Password</h1>
-      <p>Hello <span class="name"><%= name %></span>,</p>
+      <h1>Account Activation</h1>
+      <p>Dear <%= name %>,</p>
       <p>
-        We received a request to reset your password. If you didn't make this
-        request, please ignore this email.
+        Thank you for registering with us. To activate your account, please
+        click the button below:
       </p>
-      <p>If you did request a password reset, click the button below:</p>
-      <a class="btn" href="<%= token %>">Reset Password</a>
+      <a class="btn" href="<%= token %>">Activate Account</a>
       <p>
-        If the button above doesn't work, you can copy and paste the following
-        link into your browser:
+        If you're having trouble clicking the button, you can also copy and
+        paste the following link into your browser:
       </p>
       <p><%= token %></p>
-      <p>This link will expire in 24 hours for security reasons.</p>
-      <p>If you have any questions, feel free to contact our support team.</p>
-      <p>Thank you!</p>
+      <p>Thank you for choosing our service!</p>
+      <p>Best regards,<br />Your aap.bgtechub.com</p>
     </div>
   </body>
 </html>

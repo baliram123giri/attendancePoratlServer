@@ -18,4 +18,7 @@ const loginSchema = Joi.object({
     password: Joi.string().trim().required("Password is required!"),
 
 })
-module.exports = { studentCreate, loginSchema }
+const activateAccountSchema = Joi.object({
+    token: Joi.string().trim().required("Token is required!")
+})
+module.exports = { studentCreate, loginSchema, activateAccountSchema }

@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const { User, Address } = require("../../models/user.model");
-const { studentCreate, loginSchema } = require("./validation");
+const { studentCreate, loginSchema, activateAccountSchema } = require("./validation");
 const { hash, compareSync } = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {
@@ -16,8 +16,7 @@ const ejs = require("ejs")
 const path = require("path")
 //create user
 async function createStudent(req, res) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+
     try {
         await studentCreate.validateAsync(req.body);
         const { address, ...rest } = req.body;
@@ -29,26 +28,41 @@ async function createStudent(req, res) {
 
         //if not  create a user but before that create user address and track in dtl => data transaction language
 
-        const addressResult = address ? await Address.create([address], { session }) : null;
         //now add user
         //hash password
         const password = await hash(rest.password, 10);
-        await User.create([{ ...rest, password, ...(addressResult ? { address: addressResult[0]._id } : {}) }], {
-            session,
-        });
-        await session.commitTransaction();
-
+        const token = jwt.sign({ ...rest, password }, process.env.JWT_SECRET, { expiresIn: "24h" })
+        const data = { token: `http://${process.env.NODE_ENV === "development" ? "localhost:3000" : "app.bgtechub.com"}/activate/${token}`, name: rest.name }
+        await ejs.renderFile(path.join(__dirname, "../../mails/activation.ejs"), data)
+        await sendEmail({
+            email: rest.email,
+            subject: `🚀 Activate Your Account Now for Exclusive Benefits!`,
+            template: "activation.ejs",
+            data
+        })
         //send response
-        return res.json({ message: "User created successfully" });
+        return res.json({ message: `Account activation link has been sent to ${req.body.email}` });
     } catch (error) {
-        await session.abortTransaction();
-        res.status(500).json({ message: error.message });
-    } finally {
-        await session.endSession();
+        return res.status(500).json({ message: error.message });
     }
 }
 
+//activate account
+async function activateAccount(req, res) {
+    try {
+        await activateAccountSchema.validateAsync(req.body)
+        const token = jwt.verify(req.body.token, process.env.JWT_SECRET)
+        if (!token) return res.status(501).json({ message: "Invalid Token!" });
+        const { iat, exp, ...rest } = token
+        const user = await User.findOne(rest)
+        if (user) return res.status(200).json({ message: "Account Already Activated" });
+        await User.create(rest)
+        return res.json({ message: "Account Activated Successfully" });
 
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
 async function loginStudent(req, res) {
     try {
         await loginSchema.validateAsync(req.body);
@@ -124,7 +138,7 @@ async function findUser(req, res) {
 //friends  list
 async function friendsList(req, res) {
     try {
-        const result = await User.find({ role: "student" }).select(["name", "email"])
+        const result = await User.find().select(["name", "email"])
         return res.json(result)
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -191,4 +205,4 @@ async function forgetpassword(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
-module.exports = { createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword };
+module.exports = { createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword, activateAccount };

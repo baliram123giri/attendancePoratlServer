@@ -3,42 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lms Activation Email</title>
+    <title>Meeting Started</title>
     <style>
-      * {
+      body {
+        font-family: "Arial", sans-serif;
         margin: 0;
         padding: 0;
+        background-color: #f4f4f4;
       }
-      .main {
-        width: 98%;
-        margin: auto;
+
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
+
       h1 {
-        background: rgb(0, 110, 255);
-        border: 1px solid rgb(0, 110, 255);
-        color: white;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        text-align: center;
-        padding: 8px;
+        color: #333;
       }
-      h2 {
-        font-weight: bold;
+
+      p {
+        color: #666;
       }
-      .content {
-        padding: 8px;
-        background: white;
-        border: 1px solid rgba(0, 0, 0, 0.2);
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
       }
     </style>
   </head>
   <body>
-    <div class="main">
-      <h1>Welcome to Student Portal</h1>
-      <div class="content">
-        <p>Hi, <%= name %></p>
-        <p>Please login Class is live</p>
-      </div>
+    <div class="container">
+      <h1>Meeting Started</h1>
+      <p>Dear <%= name %>,</p>
+      <p>
+        We're excited to inform you that the meeting has started. Please join
+        using the link below:
+      </p>
+      <p>Meeting Details:</p>
+      <ul>
+        <li><strong>Date:</strong> <%= date %></li>
+        <li><strong>Time:</strong> <%= time %></li>
+        <li><strong>Meeting ID:</strong> [MeetingID]</li>
+      </ul>
+      <p>Thank you for your participation!</p>
+      <p>Best regards,<br />Your Company Name</p>
     </div>
   </body>
 </html>

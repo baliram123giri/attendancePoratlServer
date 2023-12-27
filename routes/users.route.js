@@ -1,5 +1,5 @@
 const multer = require('multer');
-const { usersList, deleteUser, friendsList, findUser, changePassword, updateAccountInfo, forgetpassword } = require('../controllers/auth/auth.controller')
+const { usersList, deleteUser, friendsList, findUser, changePassword,  forgetpassword } = require('../controllers/auth/auth.controller')
 const { User, Address } = require('../models/user.model')
 const { authorize, setAccessTokenCookie } = require('../utils/auth.util');
 const { verify } = require('jsonwebtoken');
