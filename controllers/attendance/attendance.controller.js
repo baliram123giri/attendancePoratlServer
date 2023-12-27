@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose")
 const { Attendance } = require("../../models/attendance.model")
 const { getTimeAndDate, converDateYYMMDD } = require("../../utils/auth.util")
-const { attendanceCreateSchema } = require("./validation")
+const { attendanceCreateSchema, addAttendanceData } = require("./validation")
 const { User } = require("../../models/user.model")
 const moment = require('moment');
 async function addAttendance(req, res) {
@@ -153,4 +153,19 @@ async function deleteAttendance(req, res) {
         return res.status(500).json({ message: error?.message })
     }
 }
-module.exports = { addAttendance, attendanceList, joinedList, deleteAttendance }
+
+//get weekly attendanse
+async function weeklyAttendance(req, res) {
+    try {
+        await addAttendanceData.validateAsync(req.body)
+        const { lastDate, today } = req.body
+        let data = await Attendance.find({ timeStamp: { $gte: lastDate, $lte: today } }).populate("studentID", "name")
+        return res.json(data)
+    } catch (error) {
+        return res.status(500).json({ message: error?.message })
+    }
+}
+// const today = new Date();
+// today.setHours(23, 59, 59, 999);
+// console.log(today.toISOString())
+module.exports = { addAttendance, attendanceList, joinedList, deleteAttendance, weeklyAttendance }
