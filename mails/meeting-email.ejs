@@ -15,10 +15,10 @@
       .container {
         max-width: 600px;
         margin: 20px auto;
-        background-color: #fff;
+        background-color: #fff !important;
         padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
       }
 
       h1 {
@@ -32,8 +32,8 @@
       .btn {
         display: inline-block;
         padding: 10px 20px;
-        background-color: #3498db;
-        color: #fff;
+        background-color: #3498db !important;
+        color: #fff !important;
         text-decoration: none;
         border-radius: 5px;
       }
@@ -44,14 +44,14 @@
       <h1>Meeting Started</h1>
       <p>Dear <%= name %>,</p>
       <p>
-        We're excited to inform you that the meeting has started. Please join
-        using the link below:
+        We're excited to inform you that the meeting has started. Please join by
+        login:
       </p>
+      <a class="btn" href="<%= login %>">Login</a>
       <p>Meeting Details:</p>
       <ul>
         <li><strong>Date:</strong> <%= date %></li>
-        <li><strong>Time:</strong> <%= time %></li>
-        <li><strong>Meeting ID:</strong> [MeetingID]</li>
+        <li><strong>Course:</strong> <%= course %></li>
       </ul>
       <p>Thank you for your participation!</p>
       <p>Best regards,<br />Your Company Name</p>

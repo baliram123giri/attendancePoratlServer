@@ -32,7 +32,7 @@ async function createStudent(req, res) {
         //hash password
         const password = await hash(rest.password, 10);
         const token = jwt.sign({ ...rest, password }, process.env.JWT_SECRET, { expiresIn: "24h" })
-        const data = { token: `http://${process.env.NODE_ENV === "development" ? "localhost:3000" : "app.bgtechub.com"}/activate/${token}`, name: rest.name }
+        const data = { token: `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://app.bgtechub.com"}/activate/${token}`, name: rest.name }
         await ejs.renderFile(path.join(__dirname, "../../mails/activation.ejs"), data)
         await sendEmail({
             email: rest.email,
@@ -192,7 +192,7 @@ async function forgetpassword(req, res) {
 
         //if user found
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "24h" })
-        const data = { name: user.name, token: `http://${process.env.NODE_ENV === "development" ? "localhost:3000" : "app.bgtechub.com"}/resetpassword/${token}` }
+        const data = { name: user.name, token: `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://app.bgtechub.com"}/resetpassword/${token}` }
         await ejs.renderFile(path.join(__dirname, "../../mails/forgetpassword.ejs"), data)
         await sendEmail({
             email: user.email,

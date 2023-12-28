@@ -6,6 +6,7 @@ const { sendEmail } = require("../../utils/sendEmail.utils")
 const ejs = require("ejs")
 const path = require("path")
 const { Attendance } = require("../../models/attendance.model")
+const { Course } = require("../../models/course.model")
 
 
 async function createMeeting(req, res) {
@@ -19,28 +20,29 @@ async function createMeeting(req, res) {
         // Set expiration time to 2 hours from now
         const expireInMinutes = 120;
         await Meeting.create({ ...req.body, date: getTimeAndDate(), time: getTimeAndDate("time"), expireAt: new Date(Date.now() + expireInMinutes * 60 * 1000) })
-        // const userdata = await User.find({ role: "student" }, { email: 1, name: 1, _id: 0 })
+        const courseData = await Course.findById(req.body.course)
+        const userdata = await User.find({ role: "student" }, { email: 1, name: 1, _id: 0 })
 
 
         try {
-            // for (let i = 0; i < userdata.length; i++) {
-            //     const data = { name: userdata[i].name }
-            //     await ejs.renderFile(path.join(__dirname, "../../mails/meeting-email.ejs"), data)
-            //     await sendEmail({
-            //         email: userdata[i].email,
-            //         subject: "Join Live class",
-            //         template: "meeting-email.ejs",
-            //         data
-            //     })
-            // }
+            for (let i = 0; i < userdata.length; i++) {
+                const data = { name: userdata[i].name, date: new Date().toLocaleDateString(), course: courseData?.name || "NA", login: `${process.env.NODE_ENV === "development" ? "http://localhost:3000/login" : "https://app.bgtechub.com/login"}` }
+                await ejs.renderFile(path.join(__dirname, "../../mails/meeting-email.ejs"), data)
+                await sendEmail({
+                    email: userdata[i].email,
+                    subject: "Login To Join Live class ",
+                    template: "meeting-email.ejs",
+                    data
+                })
+            }
 
-        //     // console.log(data)
-        return res.json({ message: "Link Created Sucessfully" })
+            //     // console.log(data)
+            return res.json({ message: "Link Created Sucessfully" })
 
         } catch (error) {
             res.status(500).json({ message: error?.message })
         }
-     
+
 
     } catch (error) {
         return res.status(500).json({ message: error?.message })
