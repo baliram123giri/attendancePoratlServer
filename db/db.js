@@ -8,7 +8,7 @@ const socketIO = require('socket.io');
 const { findMeetingsByToday } = require("../controllers/meeting/meeting.controller");
 const { joinedList } = require("../controllers/attendance/attendance.controller");
 const { MessageModel } = require("../models/message.model");
-const { Assignments } = require("../models/assignment.mode");
+
 
 const server = http.createServer(app);
 const io = socketIO(server, {

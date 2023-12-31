@@ -17,7 +17,7 @@ const MessageSchema = new mongoose.Schema({
         default: ""
     },
     docsName: String,
-    createdAt: { type: Date, expires: 3600 }
+    createdAt: { type: Date, expires: 432000  }
 })
 
 const MessageModel = mongoose.model("Message", MessageSchema)

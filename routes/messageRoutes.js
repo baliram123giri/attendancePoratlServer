@@ -19,7 +19,8 @@ router.post("/", upload.single('docs'), async (req, res) => {
     try {
         const { chatId, text, senderId, receiverId, docsName } = req.body
         await MessageModel.collection.dropIndex("createdAt_1")
-        await MessageModel.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 })
+        //5days expire time
+        await MessageModel.collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 432000 })
         const publicId = `${String(generateRandomId())}`;
 
         if (req.file) {
@@ -35,7 +36,7 @@ router.post("/", upload.single('docs'), async (req, res) => {
                 if (err) {
                     return res.status(500).json({ error: 'Error uploading to Cloudinary', err });
                 } else {
-                    const finalResult =     await MessageModel.create({ _id: publicId, chatId, text, senderId, receiverId, docs: result.url, docsName, createdAt: new Date() })
+                    const finalResult = await MessageModel.create({ _id: publicId, chatId, text, senderId, receiverId, docs: result.url, docsName, createdAt: new Date() })
                     return res.json(finalResult)
                 }
             }).end(req.file.buffer)
