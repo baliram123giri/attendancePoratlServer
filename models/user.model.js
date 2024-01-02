@@ -22,7 +22,10 @@ const UserSchema = new mongoose.Schema({
     role: {
         type: String,
         default: "student"
-    }
+    },
+    gender: String,
+    Stream: String,
+    dob: Date
 })
 
 const User = mongoose.model("User", UserSchema)
