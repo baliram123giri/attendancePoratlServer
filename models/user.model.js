@@ -24,8 +24,8 @@ const UserSchema = new mongoose.Schema({
         default: "student"
     },
     gender: String,
-    Stream: String,
-    dob: Date
+    stream: String,
+    dob: String
 })
 
 const User = mongoose.model("User", UserSchema)
