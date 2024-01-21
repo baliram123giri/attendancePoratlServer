@@ -11,7 +11,8 @@ const AttendanceSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    course: { type: mongoose.Schema.ObjectId, ref: "Course" }
+    course: [{ name: { type: mongoose.Schema.ObjectId, ref: "Course" }, time: String }],
+    teacherId: [{ type: mongoose.Schema.ObjectId, ref: "User" }]
 })
 
 

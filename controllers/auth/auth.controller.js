@@ -135,6 +135,14 @@ async function findUser(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
+async function aboutUser(req, res) {
+    try {
+        const result = await User.findById(req.params.id).populate("address")
+        return res.json(result)
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
 //friends  list
 async function friendsList(req, res) {
     try {
@@ -205,4 +213,4 @@ async function forgetpassword(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
-module.exports = { createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword, activateAccount };
+module.exports = { aboutUser, createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword, activateAccount };

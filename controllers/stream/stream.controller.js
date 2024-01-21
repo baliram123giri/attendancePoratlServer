@@ -7,7 +7,7 @@ async function CreateStream(req, res) {
         const { name } = req.body
         const isStream = await StreamModel.findOne({ name })
         if (isStream) return res.status(400).json({ message: `${name} already added!` })
-        await StreamModel.create(req.body)
+        await StreamModel.create({ ...req.body, createdBy: res.id })
         return res.json({ message: `${name} added successfully...` })
     } catch (error) {
         return res.status(500).json({ message: error?.message })
@@ -25,7 +25,7 @@ async function ListStream(req, res) {
 async function UpdateStream(req, res) {
     try {
         const { name } = req.body;
-        await StreamModel.findByIdAndUpdate(req.params.id, { name });
+        await StreamModel.findByIdAndUpdate(req.params.id, { name, createdBy: res.id });
         return res.json({ message: `Stream with ID ${req.params.id} updated successfully.` });
     } catch (error) {
         return res.status(500).json({ message: error?.message });

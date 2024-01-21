@@ -7,7 +7,7 @@ const MeetingSchema = new mongoose.Schema({
     date: String,
     course: { type: mongoose.Schema.ObjectId, ref: "Course", required: true },
     time: String,
-    expireAt: Date
+    userId:{ type: mongoose.Schema.ObjectId, ref: "User", required: true },
 }, { timestamps: true })
 
 const Meeting = mongoose.model("Meeting", MeetingSchema)

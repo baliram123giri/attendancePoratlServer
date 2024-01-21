@@ -8,6 +8,8 @@ const socketIO = require('socket.io');
 const { findMeetingsByToday } = require("../controllers/meeting/meeting.controller");
 const { joinedList } = require("../controllers/attendance/attendance.controller");
 const { MessageModel } = require("../models/message.model");
+const { Meeting } = require("../models/meeting.model");
+const { Attendance } = require("../models/attendance.model");
 
 
 const server = http.createServer(app);
@@ -39,14 +41,20 @@ let OnlineUsers = []
 io.on('connection', (socket) => {
     // Handle socket events here
     socket.on("allAttendance", async () => {
-        const result = await joinedList()
-        io.emit("allAttendance", result)
+
+    })
+    // Handle socket events here
+    socket.on("deleteAttendance", async () => {
+
     })
 
     //create a meeting link 
     socket.on("meeting", async () => {
-        const result = await findMeetingsByToday()
-        io.emit("meeting", result)
+
+    })
+    //Delete a meeting link 
+    socket.on("deleteMeeting", async () => {
+
     })
 
     //users list
@@ -164,5 +172,24 @@ MessageModel.watch().on("change", async (event) => {
 })
 
 
+Meeting.watch().on("change", async (event) => {
+    if (event.operationType === "insert") {
+        const { _id } = event.fullDocument
+        const meeting = await Meeting.findOne({ _id }).populate("course")
+        io.emit("meeting", meeting)
+    }
+    if (event.operationType === "delete") {
+        const { documentKey: { _id } } = event
+        io.emit("deleteMeeting", _id)
+    }
+})
 
+Attendance.watch().on("change", async (event) => {
+    if (event.operationType === "insert") {
+        io.emit("allAttendance", null)
+    }
+    if (event.operationType === "update") {
+        io.emit("allAttendance", null)
+    }
+})
 module.exports = { connectDb, server, app, express }

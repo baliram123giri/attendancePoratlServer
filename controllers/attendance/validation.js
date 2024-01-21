@@ -2,7 +2,8 @@ const Joi = require("joi")
 
 const attendanceCreateSchema = Joi.object({
     isPresent: Joi.boolean().required("isPresent required!"),
-    course: Joi.string().trim().required("course is required!")
+    course: Joi.string().trim().required("course is required!"),
+    teacherId: Joi.string().trim().required("Teacher Id is required!"),
 })
 
 const addAttendanceData = Joi.object({
