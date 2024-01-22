@@ -28,10 +28,10 @@ async function createMeeting(req, res) {
                 const findTeacher = await User.findById(res.id)
 
                 for (let i = 0; i < userdata.length; i++) {
-                    if (userdata[i]._id !== res.id) {
+                    if (userdata[i]._id !== new mongoose.Types.ObjectId(res.id)) {
                         const data = { name: userdata[i].name, date: new Date().toLocaleDateString(), course: courseData?.name || "NA", login: `${process.env.NODE_ENV === "development" ? "http://localhost:3000/login" : "https://app.bgtechub.com/login"}`, teacher: findTeacher.name }
                         await ejs.renderFile(path.join(__dirname, "../../mails/meeting-email.ejs"), data)
-                        await    sendEmail({
+                        await sendEmail({
                             email: userdata[i].email,
                             subject: "Login To Join Live class ",
                             template: "meeting-email.ejs",
