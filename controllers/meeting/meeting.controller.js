@@ -24,7 +24,7 @@ async function createMeeting(req, res) {
         try {
             if (process.env.NODE_ENV !== "development") {
                 const courseData = await Course.findById(req.body.course)
-                const userdata = await User.find({}, { email: 1, name: 1, _id: 0 })
+                const userdata = await User.find({ isActive: true }, { email: 1, name: 1, _id: 0 })
                 const findTeacher = await User.findById(res.id)
 
                 for (let i = 0; i < userdata.length; i++) {

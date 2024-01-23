@@ -14,6 +14,10 @@ const UserSchema = new mongoose.Schema({
     email: String,
     mobile: Number,
     password: String,
+    isActive: {
+        type: Boolean,
+        default: false
+    },
     address: { type: mongoose.Schema.ObjectId, ref: "Address" },
     avatar: {
         type: String,
