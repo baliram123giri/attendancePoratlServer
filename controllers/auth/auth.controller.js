@@ -84,10 +84,12 @@ async function loginStudent(req, res) {
         }
         const assignment = await Assignments.findOne({ userId: new mongoose.Types.ObjectId(user?._id) }).sort({ created: -1 })
         let checkUserValid = user
-        if (!assignment && user?.softActive && !user?.isActive && user.role !== "admin") {
+        if ((!assignment && (!user?.softActive || !user?.isActive)) && user.role !== "admin") {
+            console.log("line 88")
             checkUserValid = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(user?._id) }, { isActive: false, softActive: false }, { new: true })
         }
-        if ((!assignment || getTimeDiff(assignment.created) > 15) && !checkUserValid?.softActive && user.role !== "admin") {
+        if ((assignment && getTimeDiff(assignment.created) > 15) && !checkUserValid?.softActive && user.role !== "admin") {
+            console.log("line 92")
             await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(user?._id) }, { isActive: false, softActive: false })
             return res.status(500).json({ message: "Your account is InActive due to assignments, please contact to admin" });
         }
@@ -172,6 +174,9 @@ async function activeHandler(req, res) {
         const userId = req.params.id
         const isActive = req.params.isActive
         await User.findByIdAndUpdate(userId, { softActive: isActive, isActive })
+        setTimeout(async () => {
+            await User.findByIdAndUpdate(userId, { softActive: false, isActive: false })
+        }, 43200000); //12hrs
         return res.json({ message: "User updated successfully..." })
     } catch (error) {
         return res.status(500).json({ message: error.message });
