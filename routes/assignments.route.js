@@ -45,7 +45,7 @@ router.post('/create', authorize("student", "admin"), upload.single('thumbnail')
                     return res.status(500).json({ error: 'Error uploading to Cloudinary', error });
                 }
                 await Assignments.create({ _id: publicId, gitUrl, netlifyUrl, title, userId: res?.id, thumbnail: result.url })
-                await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(res?.id) }, { isActive: true, softActive: true })
+                await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(res?.id) }, { isActive: true })
                 // Respond with the Cloudinary URL of the processed image
                 res.json({ message: "Assignment Created Successfully" });
 
