@@ -84,7 +84,7 @@ async function loginStudent(req, res) {
         }
         const assignment = await Assignments.findOne({ userId: new mongoose.Types.ObjectId(user?._id) }).sort({ created: -1 })
         let checkUserValid = user
-        if (assignment && (getTimeDiff(assignment.created) > 15) && user?.softActive && user.role !== "admin") {
+        if (assignment && (getTimeDiff(assignment?.created) > 15) && user?.softActive && user.role !== "admin") {
             checkUserValid = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(user?._id) }, { isActive: false, softActive: false }, { new: true })
         }
         if ((!assignment || getTimeDiff(assignment.created) > 15) && !checkUserValid?.softActive && user.role !== "admin") {
@@ -98,7 +98,7 @@ async function loginStudent(req, res) {
 
         return res.json({
             ...user._doc,
-            ...(user?.role === "student" ? { inActiveTime: getTimeDiff(assignment.created) } : {})
+            ...(user?.role === "student" ? { inActiveTime: assignment ? getTimeDiff(assignment.created) : 15 } : {})
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
