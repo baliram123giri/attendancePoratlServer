@@ -7,6 +7,8 @@ const { assignmentCreateSchema } = require("../controllers/assignments/validatio
 const { Assignments } = require("../models/assignment.mode");
 const { authorize, generateRandomId } = require("../utils/auth.util");
 const { getAllAssignments, getSingleAssignment } = require("../controllers/assignments/assignments.controller");
+const { User } = require("../models/user.model");
+const { default: mongoose } = require("mongoose");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -43,6 +45,7 @@ router.post('/create', authorize("student", "admin"), upload.single('thumbnail')
                     return res.status(500).json({ error: 'Error uploading to Cloudinary', error });
                 }
                 await Assignments.create({ _id: publicId, gitUrl, netlifyUrl, title, userId: res?.id, thumbnail: result.url })
+                await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(res?.id) }, { isActive: true, softActive: true })
                 // Respond with the Cloudinary URL of the processed image
                 res.json({ message: "Assignment Created Successfully" });
 
@@ -73,6 +76,8 @@ router.put("/update/:id", authorize("student", "admin"), upload.single('thumbnai
         // Check if an image was provided in the update
         const assignment = await Assignments.findById(req.params.id)
         if (!assignment) return res.status(400).json({ message: "Assignment not found" })
+
+
         if (req?.file) {
             // Explicitly set the public ID for Cloudinary upload
             const publicId = `${req.params.id}`;

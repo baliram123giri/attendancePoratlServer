@@ -153,17 +153,33 @@ function converDateYYMMDD(date) {
     return date?.split("/").reverse().join("-")
 }
 
+function getTimeDiff(created) {
+    // Assuming created is a valid Date object or a date string
+    const assignmentCreatedDate = new Date(created);
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // Calculate the difference in milliseconds
+    const timeDifference = currentDate - assignmentCreatedDate;
+
+    // Calculate the difference in days
+    const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+    // Check if the difference is less than 15 days
+    return Math.floor(daysDifference)
+
+}
 function generateRandomId() {
     const characters = '0123456789abcdef';
     let randomId = '';
-  
+
     for (let i = 0; i < 32; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      randomId += characters.charAt(randomIndex);
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomId += characters.charAt(randomIndex);
     }
-  
+
     return randomId;
-  }
+}
 
 
-module.exports = { generateAccessToken, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate, converDateYYMMDD , generateRandomId}
+module.exports = { generateAccessToken, getTimeDiff, verifyAccessToken, setAccessTokenCookie, authorize, deleteFiles, getTimeAndDate, converDateYYMMDD, generateRandomId }

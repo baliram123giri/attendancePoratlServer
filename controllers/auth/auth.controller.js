@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const {
     generateAccessToken,
     setAccessTokenCookie,
+    getTimeDiff,
 } = require("../../utils/auth.util");
 const { Attendance } = require("../../models/attendance.model");
 const { MessageModel } = require("../../models/message.model");
@@ -78,6 +79,18 @@ async function loginStudent(req, res) {
         const isValid = compareSync(password, user.password);
         if (!isValid)
             return res.status(500).json({ message: "Email or password wrong" });
+        if (!user.isActive) {
+            return res.status(500).json({ message: "Your account is InActive due to assignments, please contact to admin " });
+        }
+        const assignment = await Assignments.findOne({ userId: new mongoose.Types.ObjectId(user?._id) }).sort({ created: -1 })
+        let checkUserValid = user
+        if (assignment && (getTimeDiff(assignment.created) > 15) && user?.softActive && user.role !== "admin") {
+            checkUserValid = await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(user?._id) }, { isActive: false, softActive: false }, { new: true })
+        }
+        if ((!assignment || getTimeDiff(assignment.created) > 15) && !checkUserValid?.softActive && user.role !== "admin") {
+            await User.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(user?._id) }, { isActive: false, softActive: false })
+            return res.status(500).json({ message: "Your account is InActive due to assignments, please contact to admin" });
+        }
         user.password = undefined;
         const token = generateAccessToken(user._doc);
 
@@ -85,6 +98,7 @@ async function loginStudent(req, res) {
 
         return res.json({
             ...user._doc,
+            ...(user?.role === "student" ? { inActiveTime: getTimeDiff(assignment.created) } : {})
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -152,6 +166,17 @@ async function friendsList(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
+//Active  handler
+async function activeHandler(req, res) {
+    try {
+        const userId = req.params.id
+        const isActive = req.params.isActive
+        await User.findByIdAndUpdate(userId, { softActive: isActive, isActive })
+        return res.json({ message: "User updated successfully..." })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
 
 async function deleteUser(req, res) {
     try {
@@ -213,4 +238,4 @@ async function forgetpassword(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
-module.exports = { aboutUser, createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword, activateAccount };
+module.exports = { aboutUser, activeHandler, createStudent, loginStudent, usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword, activateAccount };

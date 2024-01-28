@@ -1,5 +1,5 @@
 const multer = require('multer');
-const { usersList, deleteUser, friendsList, findUser, changePassword, forgetpassword, aboutUser } = require('../controllers/auth/auth.controller')
+const { usersList, deleteUser, activeHandler, friendsList, findUser, changePassword, forgetpassword, aboutUser } = require('../controllers/auth/auth.controller')
 const { User, Address } = require('../models/user.model')
 const { authorize, setAccessTokenCookie } = require('../utils/auth.util');
 const { verify } = require('jsonwebtoken');
@@ -21,6 +21,7 @@ const upload = multer({ storage: storage });
 
 router.get('/list', usersList)
 router.get('/friends/list', friendsList)
+router.get('/active/:id/:isActive', activeHandler)
 router.get('/find/:id', findUser)
 router.get('/about/:id', authorize("admin"), aboutUser)
 router.delete('/delete/:id', authorize("admin"), deleteUser)

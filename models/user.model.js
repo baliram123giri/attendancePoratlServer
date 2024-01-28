@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    softActive: {
+        type: Boolean,
+        default: false
+    },
     address: { type: mongoose.Schema.ObjectId, ref: "Address" },
     avatar: {
         type: String,
